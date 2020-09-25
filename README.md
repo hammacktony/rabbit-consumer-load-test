@@ -1,11 +1,29 @@
 # Spamming tool
 
+Allows for a high velocity and high sustainability load test of messages to a RabbitMQ queue to test one's consumers
+
 ## Install
 
-Clone repo and do `pip3 install -r requirements.txt`.
+Run the following for dependencies
+
+```sh
+go get -u "github.com/sirupsen/logrus"
+go get -u "github.com/streadway/amqp"
+```
+
+Run `go build spammer.go` to build the binary.
 
 ## Run the program
 
-Fo something like `python3 start.py -u <ampq_url> -f data/message.json -q <queue_name> -n 10000`.
+Example:
 
-If you get real stuck and confused, run `python3 start.py --help`.
+```sh
+./spammer \
+    -url=amqp://guest:guest@localhost:5672 \
+    -workers=5 \
+    -messages=5 \
+    -queue=my_events \
+    -filename=message.json
+```
+
+Sends 5 goroutines to send 5 messages each, so it is 25 messages total.
