@@ -9,11 +9,10 @@ import (
 	"github.com/streadway/amqp"
 )
 
-const exchangeName string = ""
-
 func main() {
-	// Get the connection string from the environment variable
+	// Parse CLI stuff
 	amqpURL := flag.String("url", "amqp://guest:guest@localhost:5672", "AMQP Url")
+	exchangeName := flag.String("exchange", "", "AMQP exchange")
 	workers := flag.Int("workers", 1, "Workers for creating messages")
 	messages := flag.Int("messages", 1, "Messages per worker")
 	queueName := flag.String("queue", "", "Queue name to send messages too")
@@ -29,18 +28,22 @@ func main() {
 		log.Fatal("Need to define a message to spam with.")
 	}
 
-	totalMessages := (*workers) * (*messages)
-
+	// Load message
 	content, err := ioutil.ReadFile(*messageLocation)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Infof("Amqp url is: %s", *amqpURL)
+	// See config setup
+	log.Debugf("AMQP url is: %s", *amqpURL)
+	log.Debugf("AMQP queue name: %s", *queueName)
+	log.Debugf("AMQP exchange is: %s", *exchangeName)
 	log.Infof("Total workers: %d", *workers)
 	log.Infof("Messages per worker: %d", *messages)
-	log.Infof("Total messages being sent overall: %d", totalMessages)
+	log.Infof("Total messages being sent overall: %d", (*workers)*(*messages))
 
+	// Begin load test
+	log.Info("Test beginning...")
 	wg := new(sync.WaitGroup)
 	wg.Add(*workers)
 
@@ -66,7 +69,7 @@ func main() {
 					Body: content,
 				}
 
-				err = channel.Publish(exchangeName, *queueName, false, false, message)
+				err = channel.Publish(*exchangeName, *queueName, false, false, message)
 
 				if err != nil {
 					log.Fatal("error publishing a message to the queue:" + err.Error())
@@ -76,5 +79,5 @@ func main() {
 		}(wg)
 	}
 	wg.Wait()
-	log.Info("Done spamming")
+	log.Info("Test completed...")
 }

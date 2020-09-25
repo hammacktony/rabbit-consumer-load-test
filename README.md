@@ -1,4 +1,4 @@
-# Spamming tool
+# Rabbit Consumer Load Test
 
 Allows for a high velocity and high sustainability load test of messages to a RabbitMQ queue to test one's consumers
 
@@ -11,14 +11,14 @@ go get -u "github.com/sirupsen/logrus"
 go get -u "github.com/streadway/amqp"
 ```
 
-Run `go build spammer.go` to build the binary.
+Run `go build main.go` to build the binary.
 
 ## Run the program
 
 Example:
 
 ```sh
-./spammer \
+./main \
     -url=amqp://guest:guest@localhost:5672 \
     -workers=5 \
     -messages=5 \
